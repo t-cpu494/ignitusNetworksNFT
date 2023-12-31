@@ -1,7 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Web3 from "web3"
+import ignitusNetworksNFTmarketplace from ".\nftmarketplace\build\contracts\ignitusNetworksNFTmarketplace.json"
 import "./App.css";
 
 function App() {
+
+  const [state, setState] = useState({
+    web3 : null,
+    contract : null,
+  })
+
+  useEffect( () => {
+    async function init() {
+    const provider = new Web3.providers.HttpProvider("https://eth-goerli.g.alchemy.com/v2/")
+    const web3 = new Web3(provider)
+    const networkId = await web3.eth.net.getId()
+    const deployedNetwork = ignitusNetworksNFTmarketplace.networks[networkId]
+    const contract = new web3.eth.Contract (
+      ignitusNetworksNFTmarketplace.abi,
+      deployedNetwork.address
+    )
+    setState({ web3: web3, contract: contract})
+    }
+    init()
+  }, [])
+  
   const [pictures, setPictures] = useState([
     { id: 1, src: "image1.jpg", price: 10 },
     { id: 2, src: "image2.jpg", price: 15 },
